@@ -1,0 +1,24 @@
+{
+	"extends": "@tsconfig/node20/tsconfig.json",
+	"compilerOptions": {
+		"rootDir": "./src",
+		"outDir": "./dist",
+		"sourceRoot": "./src",
+		"types": ["node", "vite/client"],
+		"declaration": true,
+		"removeComments": false,
+		"inlineSources": true,
+		"inlineSourceMap": true,
+		"forceConsistentCasingInFileNames": true,
+		"noImplicitReturns": true,
+		"noImplicitThis": true,
+		"noImplicitAny": true,
+		"importHelpers": true,
+		"strictNullChecks": true,
+		"noUncheckedIndexedAccess": true,
+		"noUnusedLocals": true,
+		"strict": true
+	},
+	"include": ["src/"],
+	"exclude": ["node_modules", "**/*.spec.ts", "*.test.ts"]
+}
