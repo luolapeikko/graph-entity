@@ -1,6 +1,6 @@
 {
 	"name": "@luolapeikko/graph-entity",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "Graph Entity service to track linked service nodes and node change events",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
