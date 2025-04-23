@@ -11,7 +11,8 @@ This allow tracking changes as example NodeJS => Express => Logins: [User1, User
 
 ```typescript
 import {EventEmitter} from 'events';
-import {GraphManager, type GraphNodeEventMapping, type IGraphBaseEntityNode, type IGraphEventEntityNode} from '.';
+import type {type GraphNodeEventMapping, type IGraphBaseEntityNode, type IGraphEventEntityNode} from '@luolapeikko/graph-entity-types';
+import {GraphManager} from '@luolapeikko/graph-entity';
 
 export const GraphTypeEnum = {
 	NodeJS: 0,
