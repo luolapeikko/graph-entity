@@ -1,9 +1,12 @@
+import {type IGraphBaseEntityNode} from '@luolapeikko/graph-entity-types';
 import {describe, expect, it, vi} from 'vitest';
 import {EventNode} from '.';
 
+type Node1 = IGraphBaseEntityNode<1, {key: string}>;
+
 describe('EventNode', () => {
 	it('should initialize with the correct properties', () => {
-		const node = new EventNode(1, 'node-1', {key: 'value'});
+		const node = new EventNode<Node1>(1, 'node-1', {key: 'value'});
 
 		expect(node.nodeType).toBe(1);
 		expect(node.getNodeId()).toBe('node-1');

@@ -247,15 +247,15 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 		return data;
 	}
 
-	private async handleNodeStructure(node: Entity, targetDepth: number, sourceDepth: number, seen = new Set<Entity>()) {
+	private async handleNodeStructure(node: Entity, targetDepth: number, sourceDepth: number, seen = new Set<Entity>()): Promise<GraphStructure<Entity>> {
 		seen.add(node); // prevent circular references
 		const targetArray = Array.from(this.getTargets(node)).filter((target) => !seen.has(target));
 		const sourceArray = Array.from(this.getSources(node)).filter((source) => !seen.has(source));
-		const data: GraphStructure = {
+		const data = {
 			type: node.nodeType,
 			id: node.getNodeId(),
 			props: await node.getNodeProps(),
-		};
+		} as GraphStructure<Entity>;
 		if (targetDepth >= 0 && targetArray.length > 0) {
 			data.targets = await Promise.all(targetArray.map((target) => this.handleNodeStructure(target, targetDepth - 1, sourceDepth, seen)));
 		}

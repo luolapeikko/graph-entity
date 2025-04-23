@@ -15,8 +15,8 @@ importers:
         specifier: ^9.25.1
         version: 9.25.1
       '@luolapeikko/graph-entity-types':
-        specifier: ^0.0.4
-        version: 0.0.4
+        specifier: ^0.0.6
+        version: 0.0.6
       '@stylistic/eslint-plugin':
         specifier: ^4.2.0
         version: 4.2.0(eslint@9.25.1)(typescript@5.8.3)
@@ -588,8 +588,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
 
-  '@luolapeikko/graph-entity-types@0.0.4':
-    resolution: {integrity: sha512-oFB0a9yoQJYbJjXkJZqHREP/6rW67LWOHIUQSnquh9CR0+EKGkRlODvwSCZ23tP9llyhmrKQ07EuJdJinJM2KA==}
+  '@luolapeikko/graph-entity-types@0.0.6':
+    resolution: {integrity: sha512-+g/Pn2GiCgav/VhM7ca6hBqgGhYy0RdLhBcQxYU8rFiwurzYg9u3p/iUK8ZbZP8XTymcABzzn89Ptjf2IvYnOg==}
 
   '@napi-rs/wasm-runtime@0.2.9':
     resolution: {integrity: sha512-OKRBiajrrxB9ATokgEQoG87Z25c67pCpYcCwmXYX8PBftC9pBfN18gnm/fh1wurSLEKIAt+QRFLFCQISrb66Jg==}
@@ -2933,7 +2933,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
 
-  '@luolapeikko/graph-entity-types@0.0.4': {}
+  '@luolapeikko/graph-entity-types@0.0.6': {}
 
   '@napi-rs/wasm-runtime@0.2.9':
     dependencies:
