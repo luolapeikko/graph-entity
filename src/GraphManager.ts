@@ -1,11 +1,11 @@
 import {EventEmitter} from 'events';
-import type {GraphEdgeStructure, GraphManagerEventMapping, GraphStructure, IGraphEntityNode, IGraphManager} from '@luolapeikko/graph-entity-types';
+import type {GraphEdge, GraphEdgeStructure, GraphManagerEventMapping, GraphStructure, IGraphEntityNode, IGraphManager} from '@luolapeikko/graph-entity-types';
 
 /**
  * GraphManager is a local graph class that manages a graph of nodes and edges. It allows adding, removing, and querying nodes and edges.
  * @example
  * const graphManager = new GraphManager<ExpressNode | NodeJSNode>();
- * @template Entity The type of the nodes in the graph. It should extend IGraphEntityNode.
+ * @template Entity Optional generic type for strict Node types.
  * @fires graphUpdate event when the graph is updated
  * @fires nodeUpdate event when a node is updated
  * @fires nodeRemove event when a node is removed
@@ -13,7 +13,7 @@ import type {GraphEdgeStructure, GraphManagerEventMapping, GraphStructure, IGrap
  * @fires edgeRemove event when an edge is removed
  * @since v0.0.1
  */
-export class GraphManager<Entity extends IGraphEntityNode<number, Record<string, unknown>>>
+export class GraphManager<Entity extends IGraphEntityNode<number, Record<string, unknown>> = IGraphEntityNode<number, Record<string, unknown>>>
 	extends EventEmitter<GraphManagerEventMapping<Entity>>
 	implements IGraphManager<Entity>
 {
@@ -67,7 +67,7 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 		isAdded = this.addSourceLink(source, target) || isAdded;
 		isAdded = this.addTargetLink(source, target) || isAdded;
 		if (isAdded) {
-			this.emit('edgeAdd', source, target);
+			this.emit('edgeAdd', {source, target});
 			if (emitGraphUpdate) {
 				this.emit('graphUpdate');
 			}
@@ -115,7 +115,7 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 		isRemoved = this.removeSourceLink(source, target) || isRemoved;
 		isRemoved = this.removeTargetLink(source, target) || isRemoved;
 		if (isRemoved) {
-			this.emit('edgeRemove', source, target);
+			this.emit('edgeRemove', {source, target});
 			if (emitGraphUpdate) {
 				this.emit('graphUpdate');
 			}
@@ -165,12 +165,20 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 		return this.sourceLinkIndex.get(node)?.values() ?? [];
 	}
 
-	/**
-	 * Get all nodes in the graph.
-	 * @returns {Iterable<Entity>} list of all nodes
-	 */
-	public getAllNodes() {
+	public getAllNodes(): Iterable<Entity> {
 		return this.nodes.values();
+	}
+
+	public getAllEdges(): Iterable<GraphEdge<Entity>> {
+		let edges: GraphEdge<Entity>[] = [];
+		// extract all edges from target link index
+		for (const [source, targets] of this.targetLinkIndex.entries()) {
+			edges = Array.from(targets).reduce((acc, target) => {
+				acc.push({source, target});
+				return acc;
+			}, edges);
+		}
+		return edges;
 	}
 
 	/**

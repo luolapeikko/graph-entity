@@ -6,9 +6,12 @@ import {GraphManager} from '.';
 export const GraphTypeEnum = {
 	NodeJS: 0,
 	Express: 10,
+	Database: 20,
 } as const;
 
 type ExpressNode = IGraphBaseEntityNode<typeof GraphTypeEnum.Express, {port: string | number | undefined; status?: 'running' | 'stopped'}>;
+
+type DatabaseNode = IGraphBaseEntityNode<typeof GraphTypeEnum.Database, {host: string | undefined; status?: 'running' | 'stopped'}>;
 
 class NodeJSNode extends EventEmitter<GraphNodeEventMapping> implements IGraphEventEntityNode<typeof GraphTypeEnum.NodeJS, {version: string}> {
 	public readonly nodeType = GraphTypeEnum.NodeJS;
@@ -30,7 +33,13 @@ const expressCopy: ExpressNode = {
 	getNodeProps: () => Promise.resolve({port: 3000, status: 'running'}),
 };
 
-const graphManager = new GraphManager<ExpressNode | NodeJSNode>();
+const database: DatabaseNode = {
+	nodeType: GraphTypeEnum.Database,
+	getNodeId: () => 'db',
+	getNodeProps: () => Promise.resolve({host: 'localhost', status: 'running'}),
+};
+
+const graphManager = new GraphManager<ExpressNode | NodeJSNode | DatabaseNode>();
 
 describe('GraphManager', function () {
 	describe('addNode/removeNode', function () {
@@ -155,6 +164,16 @@ describe('GraphManager', function () {
 			expect(nodes).to.have.length(2);
 			expect(nodes).to.include(nodejs);
 			expect(nodes).to.include(express);
+		});
+	});
+	describe('getAllEdges', function () {
+		it('should get all edges', function () {
+			graphManager.addEdge(nodejs, express);
+			graphManager.addEdge(nodejs, database);
+			const edges = graphManager.getAllEdges();
+			expect(edges).to.be.an('array').with.lengthOf(2);
+			expect(edges).to.deep.include({source: nodejs, target: express});
+			expect(edges).to.deep.include({source: nodejs, target: database});
 		});
 	});
 	describe('getNodesByType', function () {
