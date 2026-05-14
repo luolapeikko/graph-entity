@@ -1,0 +1,41 @@
+{
+	"name": "@luolapeikko/graph-entity",
+	"version": "0.0.6",
+	"description": "Graph Entity service to track linked service nodes and node change events",
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.mts",
+	"exports": {
+		"import": {
+			"types": "./dist/index.d.mts",
+			"default": "./dist/index.mjs"
+		},
+		"require": {
+			"types": "./dist/index.d.cts",
+			"default": "./dist/index.cjs"
+		},
+		"default": "./dist/index.mjs"
+	},
+	"scripts": {
+		"build": "tsdown src/index.ts --sourcemap --format esm --dts --clean -c tsconfig.build.json",
+		"validate": "tsc --noEmit"
+	},
+	"files": [
+		"dist"
+	],
+	"repository": "github:luolapeikko/graph-entity",
+	"keywords": [
+		"typescript",
+		"graph",
+		"node",
+		"edge"
+	],
+	"author": "mharj",
+	"license": "MIT",
+	"devDependencies": {
+		"@luolapeikko/graph-entity-types": "workspace:*"
+	},
+	"peerDependencies": {
+		"@luolapeikko/graph-entity-types": ">=0.0.10"
+	}
+}

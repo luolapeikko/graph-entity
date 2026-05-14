@@ -1,4 +1,4 @@
-import {type IGraphBaseEntityNode} from '@luolapeikko/graph-entity-types';
+import type {IGraphBaseEntityNode} from '@luolapeikko/graph-entity-types';
 import {describe, expect, it, vi} from 'vitest';
 import {EventNode} from '.';
 

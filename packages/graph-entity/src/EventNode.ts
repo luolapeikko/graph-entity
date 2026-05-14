@@ -1,5 +1,5 @@
-import {EventEmitter} from 'events';
 import type {GraphNodeEventMapping, IGraphBaseEntityNode} from '@luolapeikko/graph-entity-types';
+import {EventEmitter} from 'events';
 
 export class EventNode<Entity extends IGraphBaseEntityNode<number, Record<string, unknown>>> extends EventEmitter<GraphNodeEventMapping> {
 	public readonly nodeType: Entity['nodeType'];

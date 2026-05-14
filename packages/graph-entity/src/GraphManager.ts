@@ -1,5 +1,5 @@
-import {EventEmitter} from 'events';
 import type {GraphEdge, GraphEdgeStructure, GraphManagerEventMapping, GraphStructure, IGraphEntityNode, IGraphManager} from '@luolapeikko/graph-entity-types';
+import {EventEmitter} from 'events';
 
 /**
  * GraphManager is a local graph class that manages a graph of nodes and edges. It allows adding, removing, and querying nodes and edges.
@@ -32,7 +32,7 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 	 * @returns {boolean} True if the node was added or updated, false if it already existed
 	 * @fires nodeUpdated event if the node was added or updated
 	 */
-	public addNode(node: Entity, emitGraphUpdate = true) {
+	public addNode(node: Entity, emitGraphUpdate = true): boolean {
 		return this.handleAddNode(node, emitGraphUpdate);
 	}
 
@@ -45,7 +45,7 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 	 * @returns {boolean} True if the node was removed, false if it did not exist.
 	 * @fires nodeRemoved event if the node was removed
 	 */
-	public removeNode(node: Entity, emitGraphUpdate = true) {
+	public removeNode(node: Entity, emitGraphUpdate = true): boolean {
 		return this.handleRemoveNode(node, true, emitGraphUpdate);
 	}
 
@@ -60,7 +60,7 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 	 * @fires edgeAdded event if the edge was added
 	 * @fires nodeUpdated event if the source or target node was added
 	 */
-	public addEdge(source: Entity, target: Entity, emitGraphUpdate = true) {
+	public addEdge(source: Entity, target: Entity, emitGraphUpdate = true): boolean {
 		let isAdded = false;
 		isAdded = this.addNode(source, emitGraphUpdate) || isAdded;
 		isAdded = this.addNode(target, emitGraphUpdate) || isAdded;
@@ -87,7 +87,7 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 	 * @fires edgeAdded event if any edge was added
 	 * @fires graphUpdate event if any edge was added
 	 */
-	public addEdges(source: Iterable<Entity>, target: Iterable<Entity>, emitGraphUpdate = true) {
+	public addEdges(source: Iterable<Entity>, target: Iterable<Entity>, emitGraphUpdate = true): boolean {
 		let isAdded = false;
 		for (const sourceNode of source) {
 			for (const targetNode of target) {
@@ -110,7 +110,7 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 	 * @returns {boolean} True if the edge was removed, false if it did not exist.
 	 * @fires edgeRemoved event if the edge was removed
 	 */
-	public removeEdge(source: Entity, target: Entity, emitGraphUpdate = true) {
+	public removeEdge(source: Entity, target: Entity, emitGraphUpdate = true): boolean {
 		let isRemoved = false;
 		isRemoved = this.removeSourceLink(source, target) || isRemoved;
 		isRemoved = this.removeTargetLink(source, target) || isRemoved;
@@ -134,7 +134,7 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 	 * @fires edgeRemoved event if any edge was removed
 	 * @fires graphUpdate event if any edge was removed
 	 */
-	public removeEdges(source: Iterable<Entity>, target: Iterable<Entity>, emitGraphUpdate = true) {
+	public removeEdges(source: Iterable<Entity>, target: Iterable<Entity>, emitGraphUpdate = true): boolean {
 		let isRemoved = false;
 		for (const sourceNode of source) {
 			for (const targetNode of target) {
@@ -152,7 +152,7 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 	 * @param {Entity} node The node to get targets for.
 	 * @returns {Iterable<Entity>} list of target nodes
 	 */
-	public getTargets(node: Entity) {
+	public getTargets(node: Entity): SetIterator<Entity> | never[] {
 		return this.targetLinkIndex.get(node)?.values() ?? [];
 	}
 
@@ -161,7 +161,7 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 	 * @param {Entity} node The node to get sources for.
 	 * @returns {Iterable<Entity>} list of source nodes
 	 */
-	public getSources(node: Entity) {
+	public getSources(node: Entity): SetIterator<Entity> | never[] {
 		return this.sourceLinkIndex.get(node)?.values() ?? [];
 	}
 
@@ -186,7 +186,7 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 	 * @param {string} id The ID of the node to get.
 	 * @returns {Entity | undefined} The node with the specified ID, or undefined if it does not exist.
 	 */
-	public getNodeById(id: string) {
+	public getNodeById(id: string): Entity | undefined {
 		return this.nodes.get(id);
 	}
 
@@ -204,7 +204,7 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 	 * Count the number of edges all source link nodes have.
 	 * @returns {number} The number of edges all source link nodes have.
 	 */
-	public getSourceEdgeCount() {
+	public getSourceEdgeCount(): number {
 		return Array.from(this.sourceLinkIndex.values()).reduce((acc, sources) => acc + sources.size, 0);
 	}
 
@@ -212,7 +212,7 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 	 * Count the number of edges all target link nodes have.
 	 * @returns {number} The number of edges all target link nodes have.
 	 */
-	public getTargetEdgeCount() {
+	public getTargetEdgeCount(): number {
 		return Array.from(this.targetLinkIndex.values()).reduce((acc, targets) => acc + targets.size, 0);
 	}
 
@@ -223,7 +223,7 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 	 * @param {number} sourceDepth The maximum source depth to traverse the graph. Default is -1.
 	 * @returns {Promise<GraphStructure>} A promise that resolves to the structure of the graph starting from the given node.
 	 */
-	public async getNodeStructure(node: Entity, targetDepth = 10, sourceDepth = -1) {
+	public getNodeStructure(node: Entity, targetDepth = 10, sourceDepth = -1): Promise<GraphStructure<Entity>> {
 		return this.handleNodeStructure(node, targetDepth, sourceDepth);
 	}
 
@@ -235,11 +235,11 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 	 * @returns {GraphEdgeStructure} The structure detailing the node's edges, with references
 	 * to both source and target nodes.
 	 */
-	public getEdgeStructure(node: Entity) {
+	public getEdgeStructure(node: Entity): GraphEdgeStructure {
 		return this.handleEdgeStructure(node);
 	}
 
-	public handleEdgeStructure(node: Entity, seen = new Set<Entity>()) {
+	public handleEdgeStructure(node: Entity, seen: Set<Entity> = new Set()): GraphEdgeStructure {
 		seen.add(node); // prevent circular references
 		const targetArray = Array.from(this.getTargets(node)).filter((target) => !seen.has(target));
 		const sourceArray = Array.from(this.getSources(node)).filter((source) => !seen.has(source));
@@ -255,14 +255,14 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 		return data;
 	}
 
-	private async handleNodeStructure(node: Entity, targetDepth: number, sourceDepth: number, seen = new Set<Entity>()): Promise<GraphStructure<Entity>> {
+	private async handleNodeStructure(node: Entity, targetDepth: number, sourceDepth: number, seen: Set<Entity> = new Set()): Promise<GraphStructure<Entity>> {
 		seen.add(node); // prevent circular references
 		const targetArray = Array.from(this.getTargets(node)).filter((target) => !seen.has(target));
 		const sourceArray = Array.from(this.getSources(node)).filter((source) => !seen.has(source));
 		const data = {
-			type: node.nodeType,
 			id: node.getNodeId(),
 			props: await node.getNodeProps(),
+			type: node.nodeType,
 		} as GraphStructure<Entity>;
 		if (targetDepth >= 0 && targetArray.length > 0) {
 			data.targets = await Promise.all(targetArray.map((target) => this.handleNodeStructure(target, targetDepth - 1, sourceDepth, seen)));
@@ -273,7 +273,7 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 		return data;
 	}
 
-	private handleAddNode(node: Entity, emitGraphUpdate = true) {
+	private handleAddNode(node: Entity, emitGraphUpdate = true): boolean {
 		const id = node.getNodeId();
 		let nodeTypeSet = this.nodeTypeIndex.get(node.nodeType);
 		if (!nodeTypeSet) {
@@ -307,7 +307,7 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 		return false;
 	}
 
-	private handleRemoveNode(node: Entity, emitNodeRemove = true, emitGraphUpdate = true) {
+	private handleRemoveNode(node: Entity, emitNodeRemove = true, emitGraphUpdate = true): boolean {
 		// Remove the node from the source and target link indices
 		for (const source of this.getSources(node)) {
 			this.removeEdge(source, node);
@@ -336,7 +336,7 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 		return false;
 	}
 
-	private addSourceLink(source: Entity, parent: Entity) {
+	private addSourceLink(source: Entity, parent: Entity): boolean {
 		let sourceLink = this.sourceLinkIndex.get(parent);
 		if (!sourceLink) {
 			sourceLink = new Set();
@@ -358,7 +358,7 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 		return false;
 	}
 
-	private addTargetLink(parent: Entity, child: Entity) {
+	private addTargetLink(parent: Entity, child: Entity): boolean {
 		let targetLink = this.targetLinkIndex.get(parent);
 		if (!targetLink) {
 			targetLink = new Set();

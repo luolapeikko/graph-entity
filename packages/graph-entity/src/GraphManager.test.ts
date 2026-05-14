@@ -1,12 +1,12 @@
+import type {GraphNodeEventMapping, IGraphBaseEntityNode, IGraphEventEntityNode} from '@luolapeikko/graph-entity-types';
 import {EventEmitter} from 'events';
-import {type GraphNodeEventMapping, type IGraphBaseEntityNode, type IGraphEventEntityNode} from '@luolapeikko/graph-entity-types';
 import {describe, expect, it} from 'vitest';
 import {GraphManager} from '.';
 
 export const GraphTypeEnum = {
-	NodeJS: 0,
-	Express: 10,
 	Database: 20,
+	Express: 10,
+	NodeJS: 0,
 } as const;
 
 type ExpressNode = IGraphBaseEntityNode<typeof GraphTypeEnum.Express, {port: string | number | undefined; status?: 'running' | 'stopped'}>;
@@ -22,21 +22,21 @@ class NodeJSNode extends EventEmitter<GraphNodeEventMapping> implements IGraphEv
 const nodejs = new NodeJSNode();
 
 const express: ExpressNode = {
-	nodeType: GraphTypeEnum.Express,
 	getNodeId: () => 'express',
 	getNodeProps: () => Promise.resolve({port: 3000, status: 'running'}),
+	nodeType: GraphTypeEnum.Express,
 };
 
 const expressCopy: ExpressNode = {
-	nodeType: GraphTypeEnum.Express,
 	getNodeId: () => 'express',
 	getNodeProps: () => Promise.resolve({port: 3000, status: 'running'}),
+	nodeType: GraphTypeEnum.Express,
 };
 
 const database: DatabaseNode = {
-	nodeType: GraphTypeEnum.Database,
 	getNodeId: () => 'db',
 	getNodeProps: () => Promise.resolve({host: 'localhost', status: 'running'}),
+	nodeType: GraphTypeEnum.Database,
 };
 
 const graphManager = new GraphManager<ExpressNode | NodeJSNode | DatabaseNode>();
@@ -104,28 +104,28 @@ describe('GraphManager', function () {
 		it('should get node structure', async function () {
 			expect(graphManager.addEdge(nodejs, express)).to.be.eq(true);
 			await expect(graphManager.getNodeStructure(nodejs, 10)).to.resolves.eql({
-				type: GraphTypeEnum.NodeJS,
 				id: 'nodejs',
 				props: {version: '18'},
 				targets: [
 					{
-						type: GraphTypeEnum.Express,
 						id: 'express',
 						props: {port: 3000, status: 'running'},
+						type: GraphTypeEnum.Express,
 					},
 				],
+				type: GraphTypeEnum.NodeJS,
 			});
 			await expect(graphManager.getNodeStructure(express, -1, 10)).to.resolves.eql({
-				type: GraphTypeEnum.Express,
 				id: 'express',
 				props: {port: 3000, status: 'running'},
 				sources: [
 					{
-						type: GraphTypeEnum.NodeJS,
 						id: 'nodejs',
 						props: {version: '18'},
+						type: GraphTypeEnum.NodeJS,
 					},
 				],
+				type: GraphTypeEnum.Express,
 			});
 		});
 	});

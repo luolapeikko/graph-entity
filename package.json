@@ -1,28 +1,10 @@
 {
-	"name": "@luolapeikko/graph-entity",
-	"version": "0.0.6",
-	"description": "Graph Entity service to track linked service nodes and node change events",
-	"main": "./dist/index.js",
-	"module": "./dist/index.mjs",
-	"types": "./dist/index.d.ts",
-	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"require": "./dist/index.js",
-			"import": "./dist/index.mjs"
-		}
-	},
-	"scripts": {
-		"doc": "typedoc",
-		"build": "tsup src/index.ts --minify --sourcemap --format cjs,esm --dts --clean",
-		"prepublishOnly": "npm run build",
-		"test": "vitest test --run --no-isolate --coverage",
-		"coverage": "vitest test --run --no-isolate --reporter=dot --coverage --coverage.reporter=lcov",
-		"lint": "eslint . --ext .ts",
-		"validate": "tsc --noEmit --project tsconfig.test.json"
-	},
-	"files": [
-		"dist"
+	"$schema": "https://json.schemastore.org/package.json",
+	"name": "graph-entity-root",
+	"version": "0.0.1",
+	"private": true,
+	"workspaces": [
+		"packages/*"
 	],
 	"repository": "github:luolapeikko/graph-entity",
 	"keywords": [
@@ -34,41 +16,30 @@
 	"author": "mharj",
 	"license": "MIT",
 	"devDependencies": {
-		"@cspell/eslint-plugin": "^9.4.0",
-		"@eslint/js": "^9.39.1",
-		"@luolapeikko/graph-entity-types": "^0.0.10",
-		"@stylistic/eslint-plugin": "^5.6.1",
-		"@tsconfig/node20": "^20.1.8",
-		"@types/node": "^22.19.2",
-		"@typescript-eslint/eslint-plugin": "^8.49.0",
-		"@typescript-eslint/parser": "^8.49.0",
-		"@vitest/coverage-v8": "^4.0.15",
-		"c8": "^10.1.3",
-		"eslint": "^9.39.1",
-		"eslint-config-prettier": "^10.1.8",
-		"eslint-import-resolver-typescript": "^4.4.4",
-		"eslint-plugin-import": "^2.32.0",
-		"eslint-plugin-jsdoc": "^61.5.0",
-		"eslint-plugin-prettier": "^5.5.4",
-		"eslint-plugin-sonarjs": "^3.0.5",
-		"prettier": "^3.7.4",
-		"source-map-support": "^0.5.21",
+		"@biomejs/biome": "2.4.15",
+		"@tsconfig/node20": "^20.1.9",
+		"@types/node": "^24.12.4",
+		"@vitest/coverage-v8": "^4.1.6",
+		"c8": "^11.0.0",
+		"prettier": "^3.8.3",
+		"tsdown": "^0.22.0",
 		"tslib": "^2.8.1",
-		"tsup": "^8.5.1",
-		"typedoc": "^0.28.15",
-		"typescript": "^5.9.3",
-		"typescript-eslint": "^8.49.0",
-		"vite": "^7.2.7",
-		"vitest": "^4.0.15"
+		"typedoc": "^0.28.19",
+		"typedoc-plugin-dt-links": "^2.0.54",
+		"typedoc-plugin-mdn-links": "^5.1.1",
+		"typescript": "^6.0.3",
+		"vite": "^8.0.12",
+		"vitest": "^4.1.6"
 	},
-	"peerDependencies": {
-		"@luolapeikko/graph-entity-types": ">=0.0.10"
+	"scripts": {
+		"build": "pnpm -r run build",
+		"pretest": "pnpm -r run build",
+		"lint": "biome check",
+		"lint:fix": "biome check --write",
+		"test": "vitest run --typecheck --coverage",
+		"coverage": "vitest test --typecheck --run --no-isolate --reporter=dot --coverage --coverage.reporter=lcov",
+		"validate": "pnpm -r run validate",
+		"docs": "typedoc --options typedoc.json --tsconfig tsconfig.workspace.json"
 	},
-	"packageManager": "pnpm@10.8.1+sha512.c50088ba998c67b8ca8c99df8a5e02fd2ae2e2b29aaf238feaa9e124248d3f48f9fb6db2424949ff901cffbb5e0f0cc1ad6aedb602cd29450751d11c35023677",
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"esbuild",
-			"unrs-resolver"
-		]
-	}
+	"packageManager": "pnpm@10.33.4+sha512.1c67b3b359b2d408119ba1ed289f34b8fc3c6873412bec6fd264fbdc82489e510fcbecb9ce9d22dae7f3b76269d8441046014bdca53b9979cd7a561ad631b800"
 }

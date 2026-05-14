@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "@luolapeikko/graph-entity-types": ["packages/graph-entity-types/src/index.ts"],
+      "@luolapeikko/graph-entity": ["packages/graph-entity/src/index.ts"]
+    }
+  }
+}

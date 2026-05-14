@@ -59,6 +59,11 @@ typings/
 
 # TS dist
 dist
+# TypeScript build info file
+tsconfig.tsbuildinfo
 
 # mocha-junit-reporter
 test-results.xml
+
+# docs
+docs

@@ -1,0 +1,18 @@
+name: graph-entity CI
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/graph-entity/**"
+      - ".github/workflows/graph-entity.yml"
+      - ".github/workflows/module.yml"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  module-flow:
+    uses: ./.github/workflows/module.yml
+    with:
+      package-path: packages/graph-entity
