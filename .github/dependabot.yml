@@ -1,7 +1,10 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
-    directory: "/"
+    directories:
+      - "/"
+      - "/packages/graph-entity"
+      - "/packages/graph-entity-types"
     schedule:
       interval: "weekly"
     allow:
