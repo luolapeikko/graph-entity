@@ -2,7 +2,10 @@ import type {IGraphEntityNode} from './Node';
 
 /**
  * A graph edge connecting two nodes.
- * @template Entity The type of the node.
+ * @template SrcEntity The type of the node.
  * @since v0.0.10
  */
-export type GraphEdge<Entity extends IGraphEntityNode<number, Record<string, unknown>>> = {source: Entity; target: Entity};
+export type GraphEdge<
+	SrcEntity extends IGraphEntityNode<string, number, Record<string, unknown>>,
+	TargetEntity extends IGraphEntityNode<string, number, Record<string, unknown>>,
+> = {source: SrcEntity; target: TargetEntity};

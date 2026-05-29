@@ -7,12 +7,12 @@ import type {IGraphBaseEntityNode, IGraphEntityNode} from './Node';
  * @template Entity The type of the nodes in the graph.
  * @since v0.0.10
  */
-export type GraphManagerEventMapping<Entity extends IGraphEntityNode<number, Record<string, unknown>>> = {
+export type GraphManagerEventMapping<Entity extends IGraphEntityNode<string, number, Record<string, unknown>>> = {
 	graphUpdate: []; // any update to the graph (node or edge)
 	nodeUpdate: [Entity];
 	nodeRemove: [Entity];
-	edgeAdd: [GraphEdge<Entity>];
-	edgeRemove: [GraphEdge<Entity>];
+	edgeAdd: [GraphEdge<Entity, Entity>];
+	edgeRemove: [GraphEdge<Entity, Entity>];
 };
 
 /**
@@ -20,9 +20,9 @@ export type GraphManagerEventMapping<Entity extends IGraphEntityNode<number, Rec
  * @template Entity The type of the node.
  * @since v0.0.2
  */
-export type GraphStructure<Entity extends IGraphBaseEntityNode<number, Record<string, unknown>>> =
-	Entity extends IGraphBaseEntityNode<infer Type, infer Props>
-		? {type: Type; id: string; props: Props; targets?: GraphStructure<Entity>[]; sources?: GraphStructure<Entity>[]}
+export type GraphStructure<Entity extends IGraphBaseEntityNode<string, number, Record<string, unknown>>> =
+	Entity extends IGraphBaseEntityNode<infer Id, infer Type, infer Props>
+		? {id: Id; type: Type; props: Props; targets?: GraphStructure<Entity>[]; sources?: GraphStructure<Entity>[]}
 		: never;
 
 /**
@@ -40,7 +40,8 @@ export type GraphEdgeStructure = {
  * @template Entity The type of the nodes in the graph.
  * @since v0.0.1
  */
-export interface IGraphManager<Entity extends IGraphEntityNode<number, Record<string, unknown>>> extends EventEmitter<GraphManagerEventMapping<Entity>> {
+export interface IGraphManager<Entity extends IGraphEntityNode<string, number, Record<string, unknown>>>
+	extends EventEmitter<GraphManagerEventMapping<Entity>> {
 	/**
 	 * Adds a node to the graph. If the node already exists, it will be updated.
 	 * @param {Entity} node The node to add to the graph
@@ -108,7 +109,7 @@ export interface IGraphManager<Entity extends IGraphEntityNode<number, Record<st
 	 * Get all edges in the graph.
 	 * @returns {Iterable<GraphEdge<Entity>> | AsyncIterable<GraphEdge<Entity>>} list of all edges
 	 */
-	getAllEdges(): Iterable<GraphEdge<Entity>> | AsyncIterable<GraphEdge<Entity>>;
+	getAllEdges(): Iterable<GraphEdge<Entity,Entity>> | AsyncIterable<GraphEdge<Entity,Entity>>;
 
 	/**
 	 * Get all nodes of a specific type.

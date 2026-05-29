@@ -13,7 +13,7 @@ import {EventEmitter} from 'events';
  * @fires edgeRemove event when an edge is removed
  * @since v0.0.1
  */
-export class GraphManager<Entity extends IGraphEntityNode<number, Record<string, unknown>> = IGraphEntityNode<number, Record<string, unknown>>>
+export class GraphManager<Entity extends IGraphEntityNode<string, number, Record<string, unknown>> = IGraphEntityNode<string, number, Record<string, unknown>>>
 	extends EventEmitter<GraphManagerEventMapping<Entity>>
 	implements IGraphManager<Entity>
 {
@@ -169,8 +169,8 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 		return this.nodes.values();
 	}
 
-	public getAllEdges(): Iterable<GraphEdge<Entity>> {
-		let edges: GraphEdge<Entity>[] = [];
+	public getAllEdges(): Iterable<GraphEdge<Entity, Entity>> {
+		let edges: GraphEdge<Entity, Entity>[] = [];
 		// extract all edges from target link index
 		for (const [source, targets] of this.targetLinkIndex.entries()) {
 			edges = Array.from(targets).reduce((acc, target) => {
@@ -244,7 +244,7 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 		const targetArray = Array.from(this.getTargets(node)).filter((target) => !seen.has(target));
 		const sourceArray = Array.from(this.getSources(node)).filter((source) => !seen.has(source));
 		const data: GraphEdgeStructure = {
-			id: node.getNodeId(),
+			id: node.nodeId,
 		};
 		if (targetArray.length > 0) {
 			data.targets = targetArray.map((target) => this.handleEdgeStructure(target, seen));
@@ -260,7 +260,7 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 		const targetArray = Array.from(this.getTargets(node)).filter((target) => !seen.has(target));
 		const sourceArray = Array.from(this.getSources(node)).filter((source) => !seen.has(source));
 		const data = {
-			id: node.getNodeId(),
+			id: node.nodeId,
 			props: await node.getNodeProps(),
 			type: node.nodeType,
 		} as GraphStructure<Entity>;
@@ -274,21 +274,20 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 	}
 
 	private handleAddNode(node: Entity, emitGraphUpdate = true): boolean {
-		const id = node.getNodeId();
 		let nodeTypeSet = this.nodeTypeIndex.get(node.nodeType);
 		if (!nodeTypeSet) {
 			nodeTypeSet = new Set();
 			this.nodeTypeIndex.set(node.nodeType, nodeTypeSet);
 		}
 
-		const currentNode = this.nodes.get(id);
+		const currentNode = this.nodes.get(node.nodeId);
 		if (!currentNode || currentNode !== node) {
 			if (currentNode) {
 				nodeTypeSet.delete(currentNode);
 				this.handleRemoveNode(currentNode, false, false); // don't emit remove event as we are replacing it
 			}
 			nodeTypeSet.add(node);
-			this.nodes.set(node.getNodeId(), node);
+			this.nodes.set(node.nodeId, node);
 			this.emit('nodeUpdate', node);
 			if (emitGraphUpdate) {
 				this.emit('graphUpdate');
@@ -318,7 +317,7 @@ export class GraphManager<Entity extends IGraphEntityNode<number, Record<string,
 		// Remove the node from the node type index
 		this.nodeTypeIndex.get(node.nodeType)?.delete(node);
 		// Remove the node from the nodes map
-		if (this.nodes.delete(node.getNodeId())) {
+		if (this.nodes.delete(node.nodeId)) {
 			const eventCallback = this.eventCallbacks.get(node);
 			// Remove the event listener if it exists
 			if (eventCallback && 'removeListener' in node) {

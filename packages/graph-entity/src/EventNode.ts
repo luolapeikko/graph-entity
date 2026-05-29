@@ -1,12 +1,15 @@
-import type {GraphNodeEventMapping, IGraphBaseEntityNode} from '@luolapeikko/graph-entity-types';
+import type {GraphNodeEventMapping, IGraphBaseEntityNode, IGraphEventEntityNode} from '@luolapeikko/graph-entity-types';
 import {EventEmitter} from 'events';
 
-export class EventNode<Entity extends IGraphBaseEntityNode<number, Record<string, unknown>>> extends EventEmitter<GraphNodeEventMapping> {
-	public readonly nodeType: Entity['nodeType'];
-	private nodeId: string;
-	private nodeProps: Awaited<ReturnType<Entity['getNodeProps']>>;
+export class EventNode<Id extends string, Type extends number, NodeProps extends Record<string, unknown>>
+	extends EventEmitter<GraphNodeEventMapping<IGraphBaseEntityNode<Id, Type, NodeProps>>>
+	implements IGraphEventEntityNode<Id, Type, NodeProps>
+{
+	public readonly nodeType: Type;
+	public readonly nodeId: Id;
+	private nodeProps: NodeProps;
 
-	public constructor(nodeType: Entity['nodeType'], nodeId: string, initialNodeProps: Awaited<ReturnType<Entity['getNodeProps']>>) {
+	public constructor(nodeType: Type, nodeId: Id, initialNodeProps: Awaited<ReturnType<IGraphEventEntityNode<Id, Type, NodeProps>['getNodeProps']>>) {
 		super();
 		this.nodeType = nodeType;
 		this.nodeId = nodeId;
@@ -19,18 +22,14 @@ export class EventNode<Entity extends IGraphBaseEntityNode<number, Record<string
 	 * @param {boolean} emitNodeUpdated Whether to emit the "nodeUpdated" event after updating the properties, default is true
 	 * @fires nodeUpdated
 	 */
-	public setNodeProps(props: Awaited<ReturnType<Entity['getNodeProps']>>, emitNodeUpdated = true): void {
+	public setNodeProps(props: NodeProps, emitNodeUpdated = true): void {
 		this.nodeProps = props;
 		if (emitNodeUpdated) {
-			this.emit('nodeUpdated');
+			this.emit('nodeUpdated', this);
 		}
 	}
 
-	public getNodeId(): string {
-		return this.nodeId;
-	}
-
-	public getNodeProps(): Awaited<ReturnType<Entity['getNodeProps']>> {
+	public getNodeProps(): NodeProps {
 		return this.nodeProps;
 	}
 }

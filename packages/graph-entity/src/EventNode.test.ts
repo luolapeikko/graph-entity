@@ -1,20 +1,19 @@
-import type {IGraphBaseEntityNode} from '@luolapeikko/graph-entity-types';
 import {describe, expect, it, vi} from 'vitest';
 import {EventNode} from '.';
 
-type Node1 = IGraphBaseEntityNode<1, {key: string}>;
+const nodeId = '48780b7a-9a80-45d0-8d39-f41e00be2c86' as const;
 
 describe('EventNode', () => {
 	it('should initialize with the correct properties', () => {
-		const node = new EventNode<Node1>(1, 'node-1', {key: 'value'});
+		const node = new EventNode<typeof nodeId, 1, {key: string}>(1, nodeId, {key: 'value'});
 
 		expect(node.nodeType).toBe(1);
-		expect(node.getNodeId()).toBe('node-1');
+		expect(node.nodeId).toBe(nodeId);
 		expect(node.getNodeProps()).toEqual({key: 'value'});
 	});
 
 	it('should update node properties and emit "nodeUpdated" event after update', () => {
-		const node = new EventNode(1, 'node-1', {key: 'value'});
+		const node = new EventNode(1, nodeId, {key: 'value'});
 		const listener = vi.fn();
 
 		node.on('nodeUpdated', listener);

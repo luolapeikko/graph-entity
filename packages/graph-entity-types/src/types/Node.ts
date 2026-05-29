@@ -10,9 +10,9 @@ import type {EventEmitter} from 'events';
  * @since v0.0.1
  * @see {@link IGraphEventEntityNode} for a node that can emit update events.
  */
-export interface IGraphBaseEntityNode<Type extends number, NodeProps extends Record<string, unknown>> {
+export interface IGraphBaseEntityNode<Id extends string, Type extends number, NodeProps extends Record<string, unknown>> {
 	readonly nodeType: Type;
-	getNodeId(): string;
+	readonly nodeId: Id;
 	getNodeProps(): NodeProps | Promise<NodeProps>;
 }
 
@@ -20,8 +20,8 @@ export interface IGraphBaseEntityNode<Type extends number, NodeProps extends Rec
  * Node event mapping for the graph. It defines the events that can be emitted by a node.
  * @since v0.0.1
  */
-export type GraphNodeEventMapping = {
-	nodeUpdated: [];
+export type GraphNodeEventMapping<T extends IGraphBaseEntityNode<string, number, Record<string, unknown>>> = {
+	nodeUpdated: [T];
 };
 
 /**
@@ -33,8 +33,12 @@ export type GraphNodeEventMapping = {
  * @since v0.0.1
  * @see {@link IGraphBaseEntityNode} for a node that does not emit events.
  */
-export type IGraphEventEntityNode<Type extends number, NodeProps extends Record<string, unknown>> = IGraphBaseEntityNode<Type, NodeProps> &
-	EventEmitter<GraphNodeEventMapping>;
+export type IGraphEventEntityNode<Id extends string, Type extends number, NodeProps extends Record<string, unknown>> = IGraphBaseEntityNode<
+	Id,
+	Type,
+	NodeProps
+> &
+	EventEmitter<GraphNodeEventMapping<IGraphBaseEntityNode<Id, Type, NodeProps>>>;
 
 /**
  * Combined type for graph nodes. It can be either a base node or an event node.
@@ -44,6 +48,6 @@ export type IGraphEventEntityNode<Type extends number, NodeProps extends Record<
  * @see {@link IGraphBaseEntityNode} for a node that does not emit events.
  * @see {@link IGraphEventEntityNode} for a node that can emit events.
  */
-export type IGraphEntityNode<Type extends number, NodeProps extends Record<string, unknown>> =
-	| IGraphBaseEntityNode<Type, NodeProps>
-	| IGraphEventEntityNode<Type, NodeProps>;
+export type IGraphEntityNode<Id extends string, Type extends number, NodeProps extends Record<string, unknown>> =
+	| IGraphBaseEntityNode<Id, Type, NodeProps>
+	| IGraphEventEntityNode<Id, Type, NodeProps>;

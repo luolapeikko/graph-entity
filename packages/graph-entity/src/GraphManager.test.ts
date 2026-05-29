@@ -9,33 +9,42 @@ export const GraphTypeEnum = {
 	NodeJS: 0,
 } as const;
 
-type ExpressNode = IGraphBaseEntityNode<typeof GraphTypeEnum.Express, {port: string | number | undefined; status?: 'running' | 'stopped'}>;
+const expressId = '159f6944-e834-4d1f-8394-a348d2aa3866' as const;
 
-type DatabaseNode = IGraphBaseEntityNode<typeof GraphTypeEnum.Database, {host: string | undefined; status?: 'running' | 'stopped'}>;
+type ExpressNode = IGraphBaseEntityNode<typeof expressId, typeof GraphTypeEnum.Express, {port: string | number | undefined; status?: 'running' | 'stopped'}>;
 
-class NodeJSNode extends EventEmitter<GraphNodeEventMapping> implements IGraphEventEntityNode<typeof GraphTypeEnum.NodeJS, {version: string}> {
+const databaseId = '927f1156-869c-4fe0-a922-190e646253eb' as const;
+
+type DatabaseNode = IGraphBaseEntityNode<typeof databaseId, typeof GraphTypeEnum.Database, {host: string | undefined; status?: 'running' | 'stopped'}>;
+
+const nodejsId = 'dd23f604-167d-4450-8d7d-d813e013879f' as const;
+
+class NodeJSNode
+	extends EventEmitter<GraphNodeEventMapping<IGraphEventEntityNode<typeof nodejsId, typeof GraphTypeEnum.NodeJS, {version: string}>>>
+	implements IGraphEventEntityNode<typeof nodejsId, typeof GraphTypeEnum.NodeJS, {version: string}>
+{
 	public readonly nodeType = GraphTypeEnum.NodeJS;
-	public getNodeId = () => 'nodejs';
+	public readonly nodeId = nodejsId;
 	public getNodeProps = () => Promise.resolve({version: '18'});
 }
 
 const nodejs = new NodeJSNode();
 
 const express: ExpressNode = {
-	getNodeId: () => 'express',
 	getNodeProps: () => Promise.resolve({port: 3000, status: 'running'}),
+	nodeId: expressId,
 	nodeType: GraphTypeEnum.Express,
 };
 
 const expressCopy: ExpressNode = {
-	getNodeId: () => 'express',
 	getNodeProps: () => Promise.resolve({port: 3000, status: 'running'}),
+	nodeId: expressId,
 	nodeType: GraphTypeEnum.Express,
 };
 
 const database: DatabaseNode = {
-	getNodeId: () => 'db',
 	getNodeProps: () => Promise.resolve({host: 'localhost', status: 'running'}),
+	nodeId: databaseId,
 	nodeType: GraphTypeEnum.Database,
 };
 
@@ -49,7 +58,7 @@ describe('GraphManager', function () {
 			expect(graphManager.addNode(express)).to.be.eq(true);
 			expect(graphManager.addNode(express)).to.be.eq(false);
 			expect(graphManager.addNode(expressCopy)).to.be.eq(true);
-			nodejs.emit('nodeUpdated');
+			nodejs.emit('nodeUpdated', nodejs);
 		});
 		it('should remove nodes', function () {
 			expect(graphManager.removeNode(nodejs)).to.be.eq(true);
@@ -104,11 +113,11 @@ describe('GraphManager', function () {
 		it('should get node structure', async function () {
 			expect(graphManager.addEdge(nodejs, express)).to.be.eq(true);
 			await expect(graphManager.getNodeStructure(nodejs, 10)).to.resolves.eql({
-				id: 'nodejs',
+				id: nodejsId,
 				props: {version: '18'},
 				targets: [
 					{
-						id: 'express',
+						id: expressId,
 						props: {port: 3000, status: 'running'},
 						type: GraphTypeEnum.Express,
 					},
@@ -116,11 +125,11 @@ describe('GraphManager', function () {
 				type: GraphTypeEnum.NodeJS,
 			});
 			await expect(graphManager.getNodeStructure(express, -1, 10)).to.resolves.eql({
-				id: 'express',
+				id: expressId,
 				props: {port: 3000, status: 'running'},
 				sources: [
 					{
-						id: 'nodejs',
+						id: nodejsId,
 						props: {version: '18'},
 						type: GraphTypeEnum.NodeJS,
 					},
@@ -133,18 +142,18 @@ describe('GraphManager', function () {
 		it('should get node structure', function () {
 			graphManager.addEdge(nodejs, express);
 			expect(graphManager.getEdgeStructure(nodejs)).to.be.eql({
-				id: 'nodejs',
+				id: nodejsId,
 				targets: [
 					{
-						id: 'express',
+						id: expressId,
 					},
 				],
 			});
 			expect(graphManager.getEdgeStructure(express)).to.be.eql({
-				id: 'express',
+				id: expressId,
 				sources: [
 					{
-						id: 'nodejs',
+						id: nodejsId,
 					},
 				],
 			});
@@ -153,8 +162,8 @@ describe('GraphManager', function () {
 	describe('getNodeById', function () {
 		it('should get node by id', function () {
 			graphManager.addEdge(nodejs, express);
-			expect(graphManager.getNodeById('nodejs')).to.be.eq(nodejs);
-			expect(graphManager.getNodeById('express')).to.be.eq(express);
+			expect(graphManager.getNodeById(nodejsId)).to.be.eq(nodejs);
+			expect(graphManager.getNodeById(expressId)).to.be.eq(express);
 		});
 	});
 	describe('getAllNodes', function () {
