@@ -1,6 +1,6 @@
 {
 	"name": "@luolapeikko/graph-entity-types",
-	"version": "0.0.10",
+	"version": "0.1.0",
 	"description": "Typess for Graph Entity module",
 	"main": "./dist/index.cjs",
 	"module": "./dist/index.mjs",

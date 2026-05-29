@@ -5,7 +5,7 @@ import type {IGraphBaseEntityNode, IGraphEntityNode} from './Node';
 /**
  * Graph manager event mapping.
  * @template Entity The type of the nodes in the graph.
- * @since v0.0.10
+ * @since v0.1.0
  */
 export type GraphManagerEventMapping<Entity extends IGraphEntityNode<string, number, Record<string, unknown>>> = {
 	graphUpdate: []; // any update to the graph (node or edge)
@@ -38,7 +38,7 @@ export type GraphEdgeStructure = {
 /**
  * Generic interface for a graph manager which can add, remove, and update nodes and edges in a graph. (supports async operations for bigger implementations)
  * @template Entity The type of the nodes in the graph.
- * @since v0.0.1
+ * @since v0.1.0
  */
 export interface IGraphManager<Entity extends IGraphEntityNode<string, number, Record<string, unknown>>>
 	extends EventEmitter<GraphManagerEventMapping<Entity>> {

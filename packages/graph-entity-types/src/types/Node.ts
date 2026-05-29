@@ -7,7 +7,7 @@ import type {EventEmitter} from 'events';
  * class Express implements IGraphBaseEntityNode<typeof GraphTypeEnum.Express, {port: string}> {}
  * @template Type The type of the node. It should be a number.
  * @template NodeProps The properties of the node. It should be an object with string keys and unknown values.
- * @since v0.0.1
+ * @since v0.1.0
  * @see {@link IGraphEventEntityNode} for a node that can emit update events.
  */
 export interface IGraphBaseEntityNode<Id extends string, Type extends number, NodeProps extends Record<string, unknown>> {
@@ -18,7 +18,7 @@ export interface IGraphBaseEntityNode<Id extends string, Type extends number, No
 
 /**
  * Node event mapping for the graph. It defines the events that can be emitted by a node.
- * @since v0.0.1
+ * @since v0.1.0
  */
 export type GraphNodeEventMapping<T extends IGraphBaseEntityNode<string, number, Record<string, unknown>>> = {
 	nodeUpdated: [T];
@@ -30,7 +30,7 @@ export type GraphNodeEventMapping<T extends IGraphBaseEntityNode<string, number,
  * class NodeJSNode extends EventEmitter<GraphNodeEventMapping> implements IGraphEventEntityNode<typeof GraphTypeEnum.NodeJS, {version: string}> {}
  * @template Type The type of the node. It should be a number.
  * @template NodeProps The properties of the node. It should be an object with string keys and unknown values.
- * @since v0.0.1
+ * @since v0.1.0
  * @see {@link IGraphBaseEntityNode} for a node that does not emit events.
  */
 export type IGraphEventEntityNode<Id extends string, Type extends number, NodeProps extends Record<string, unknown>> = IGraphBaseEntityNode<
