@@ -109,7 +109,7 @@ export interface IGraphManager<Entity extends IGraphEntityNode<string, number, R
 	 * Get all edges in the graph.
 	 * @returns {Iterable<GraphEdge<Entity>> | AsyncIterable<GraphEdge<Entity>>} list of all edges
 	 */
-	getAllEdges(): Iterable<GraphEdge<Entity,Entity>> | AsyncIterable<GraphEdge<Entity,Entity>>;
+	getAllEdges(): Iterable<GraphEdge<Entity, Entity>> | AsyncIterable<GraphEdge<Entity, Entity>>;
 
 	/**
 	 * Get all nodes of a specific type.

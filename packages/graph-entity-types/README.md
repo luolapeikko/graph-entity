@@ -39,13 +39,13 @@ type MyNode = IGraphBaseEntityNode<1, { label: string }>;
 
 const nodeA: MyNode = {
 	nodeType: 1,
-	getNodeId: () => 'A',
+	nodeId: 'cf9cda0d-b479-4e07-b2bd-695c161d71db',
 	getNodeProps: () => ({ label: 'Node A' }),
 };
 
 const nodeB: MyNode = {
 	nodeType: 1,
-	getNodeId: () => 'B',
+	nodeId: 'b4794e07-b2bd-695c-161d71dbcf9cda0d',
 	getNodeProps: () => ({ label: 'Node B' }),
 };
 

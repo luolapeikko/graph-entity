@@ -21,6 +21,7 @@
 		"@types/node": "^24.12.4",
 		"@vitest/coverage-v8": "^4.1.7",
 		"c8": "^11.0.0",
+		"lefthook": "^2.1.9",
 		"prettier": "^3.8.3",
 		"tsdown": "^0.22.1",
 		"tslib": "^2.8.1",
@@ -32,6 +33,7 @@
 		"vitest": "^4.1.7"
 	},
 	"scripts": {
+		"prepare": "lefthook install",
 		"build": "pnpm -r run build",
 		"pretest": "pnpm -r run build",
 		"lint": "biome check",
