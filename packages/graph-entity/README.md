@@ -27,17 +27,17 @@ const manager = new GraphManager<ExpressJs | NodeJsNode>();
 type NodeJsNode = IGraphBaseEntityNode<typeof GraphTypeEnum.NodeJS, {version: string}>;
 export const rootNodejsGraphNode: NodeJsNode = {
 	nodeType: GraphTypeEnum.NodeJS,
-	getNodeId: () => 'nodejs',
+	nodeId: '2ac3bccb-8258-4543-90f6-8fee01a3c308' as const,
 	getNodeProps: () => ({version: process.versions.node}),
 };
 manager.addNode(rootNodejsGraphNode); // add nodejs node to manager
 
 export class ExpressJs
 	extends EventEmitter<GraphNodeEventMapping>
-	implements IGraphEventEntityNode<typeof GraphTypeEnum.Express, {port: string | number | undefined; status?: 'running' | 'stopped'}>
+	implements IGraphEventEntityNode<string, typeof GraphTypeEnum.Express, {port: string | number | undefined; status?: 'running' | 'stopped'}>
 {
 	public nodeType = GraphTypeEnum.Express;
-	public getNodeId = () => 'express';
+	public nodeId = 'd32eab72-b222-4a4e-af05-f6ea0a1ff03e' as const;
 	private port: string;
 	private status: 'running' | 'stopped' = 'stopped';
 	public constructor(port: string) {

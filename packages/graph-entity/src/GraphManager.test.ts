@@ -1,6 +1,6 @@
 import type {GraphNodeEventMapping, IGraphBaseEntityNode, IGraphEventEntityNode} from '@luolapeikko/graph-entity-types';
 import {EventEmitter} from 'events';
-import {describe, expect, it} from 'vitest';
+import {afterAll, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 import {GraphManager} from '.';
 
 export const GraphTypeEnum = {
@@ -25,10 +25,11 @@ class NodeJSNode
 {
 	public readonly nodeType = GraphTypeEnum.NodeJS;
 	public readonly nodeId = nodejsId;
+	public constructor(_port: string | number, _something: string) {
+		super();
+	}
 	public getNodeProps = () => Promise.resolve({version: '18'});
 }
-
-const nodejs = new NodeJSNode();
 
 const express: ExpressNode = {
 	getNodeProps: () => Promise.resolve({port: 3000, status: 'running'}),
@@ -48,23 +49,42 @@ const database: DatabaseNode = {
 	nodeType: GraphTypeEnum.Database,
 };
 
-const graphManager = new GraphManager<ExpressNode | NodeJSNode | DatabaseNode>();
+const nodeCreatedListener = vi.fn();
+let graphManager: GraphManager<ExpressNode | NodeJSNode | DatabaseNode>;
+
+let nodejs: NodeJSNode;
+
+let automaticMappig = true;
 
 describe('GraphManager', function () {
+	beforeEach(async function () {
+		graphManager = new GraphManager<ExpressNode | NodeJSNode | DatabaseNode>(
+			automaticMappig
+				? [
+						[nodejsId, expressId],
+						[nodejsId, databaseId],
+						[nodejsId, nodejsId], // broken, should not add to autoMap
+					]
+				: undefined,
+		);
+		graphManager.on('nodeCreated', nodeCreatedListener);
+		nodejs = await graphManager.createNode(NodeJSNode, 3000, 'some test argument');
+	});
 	describe('addNode/removeNode', function () {
-		it('should add nodes', function () {
-			expect(graphManager.addNode(nodejs)).to.be.eq(true);
+		it('should create nodes', function () {
+			expect(nodeCreatedListener).toHaveBeenCalledTimes(1); // nodejs class should have been created by GraphManager.createNode
 			expect(graphManager.addNode(nodejs)).to.be.eq(false);
 			expect(graphManager.addNode(express)).to.be.eq(true);
 			expect(graphManager.addNode(express)).to.be.eq(false);
 			expect(graphManager.addNode(expressCopy)).to.be.eq(true);
 			nodejs.emit('nodeUpdated', nodejs);
 		});
-		it('should remove nodes', function () {
-			expect(graphManager.removeNode(nodejs)).to.be.eq(true);
-			expect(graphManager.removeNode(nodejs)).to.be.eq(false);
-			expect(graphManager.removeNode(express)).to.be.eq(true);
-			expect(graphManager.removeNode(express)).to.be.eq(false);
+		it('should remove nodes', async function () {
+			expect(graphManager.addNode(express)).to.be.eq(true);
+			await expect(graphManager.removeNode(nodejs)).to.be.resolves.eq(true);
+			await expect(graphManager.removeNode(nodejs)).to.be.resolves.eq(false);
+			await expect(graphManager.removeNode(express)).to.be.resolves.eq(true);
+			await expect(graphManager.removeNode(express)).to.be.resolves.eq(false);
 		});
 	});
 	describe('addEdge/removeEdge', function () {
@@ -75,6 +95,7 @@ describe('GraphManager', function () {
 			expect(graphManager.getTargetEdgeCount()).to.be.eq(1);
 		});
 		it('should remove edges', function () {
+			expect(graphManager.addNode(express)).to.be.eq(true);
 			expect(graphManager.removeEdge(nodejs, express)).to.be.eq(true);
 			expect(graphManager.removeEdge(nodejs, express)).to.be.eq(false);
 			expect(graphManager.getSourceEdgeCount()).to.be.eq(0);
@@ -89,22 +110,54 @@ describe('GraphManager', function () {
 			expect(graphManager.getTargetEdgeCount()).to.be.eq(1);
 		});
 		it('should remove edges', function () {
+			expect(graphManager.addNode(express)).to.be.eq(true);
 			expect(graphManager.removeEdges([nodejs], [express])).to.be.eq(true);
 			expect(graphManager.removeEdges([nodejs], [express])).to.be.eq(false);
 			expect(graphManager.getSourceEdgeCount()).to.be.eq(0);
 			expect(graphManager.getTargetEdgeCount()).to.be.eq(0);
 		});
 	});
-	describe('remove when have edge', function () {
-		it('should remove from target node', function () {
-			graphManager.addEdge(nodejs, express);
-			expect(graphManager.removeNode(express)).to.be.eq(true);
+	describe('addEdgeWithId', function () {
+		beforeAll(() => {
+			automaticMappig = false;
+		});
+		it('should add edges with id', function () {
+			expect(graphManager.addNode(express)).to.be.eq(true);
+			expect(graphManager.addEdgeWithId(nodejsId, expressId)).to.be.eq(true);
+			expect(graphManager.addEdgeWithId(nodejsId, expressId)).to.be.eq(false);
+			expect(graphManager.getSourceEdgeCount()).to.be.eq(1);
+			expect(graphManager.getTargetEdgeCount()).to.be.eq(1);
+		});
+		it('should throw when adding edges without node', function () {
+			expect(() => graphManager.addEdgeWithId(nodejsId, expressId)).to.throw('Cannot add edge with non-existent node(s)');
+			expect(() => graphManager.addEdgeWithId(expressId, nodejsId)).to.throw('Cannot add edge with non-existent node(s)');
+		});
+		afterAll(() => {
+			automaticMappig = true;
+		});
+	});
+	describe('removeEdgeWithId', function () {
+		it('should remove edges with id', function () {
+			expect(graphManager.addNode(express)).to.be.eq(true);
+			expect(graphManager.removeEdgeWithId(nodejsId, expressId)).to.be.eq(true);
+			expect(graphManager.removeEdgeWithId(nodejsId, expressId)).to.be.eq(false);
 			expect(graphManager.getSourceEdgeCount()).to.be.eq(0);
 			expect(graphManager.getTargetEdgeCount()).to.be.eq(0);
 		});
-		it('should remove from source node', function () {
+		it('should return false when removing edges without node', function () {
+			expect(graphManager.removeEdgeWithId(nodejsId, expressId)).to.be.eq(false);
+		});
+	});
+	describe('remove when have edge', function () {
+		it('should remove from target node', async function () {
 			graphManager.addEdge(nodejs, express);
-			expect(graphManager.removeNode(nodejs)).to.be.eq(true);
+			await expect(graphManager.removeNode(express)).to.be.resolves.eq(true);
+			expect(graphManager.getSourceEdgeCount()).to.be.eq(0);
+			expect(graphManager.getTargetEdgeCount()).to.be.eq(0);
+		});
+		it('should remove from source node', async function () {
+			graphManager.addEdge(nodejs, express);
+			await expect(graphManager.removeNode(nodejs)).to.be.resolves.eq(true);
 			expect(graphManager.getSourceEdgeCount()).to.be.eq(0);
 			expect(graphManager.getTargetEdgeCount()).to.be.eq(0);
 		});
@@ -191,6 +244,10 @@ describe('GraphManager', function () {
 			const nodes = Array.from(graphManager.getNodesByType(GraphTypeEnum.NodeJS));
 			expect(nodes).to.have.length(1);
 			expect(nodes[0]).to.be.eq(nodejs);
+		});
+		it('should get empty list if no nodes for a given type', function () {
+			const nodes = Array.from(graphManager.getNodesByType(GraphTypeEnum.Express));
+			expect(nodes).to.have.length(0);
 		});
 	});
 });

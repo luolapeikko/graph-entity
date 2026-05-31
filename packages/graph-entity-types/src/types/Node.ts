@@ -11,10 +11,26 @@ import type {EventEmitter} from 'events';
  * @see {@link IGraphEventEntityNode} for a node that can emit update events.
  */
 export interface IGraphBaseEntityNode<Id extends string, Type extends number, NodeProps extends Record<string, unknown>> {
+	/**
+	 * The type of the node. It should be a const number. (like an enum value)
+	 */
 	readonly nodeType: Type;
+	/**
+	 * The unique identifier of the node. It should be a const string for static nodes. (like UUID)
+	 */
 	readonly nodeId: Id;
 	getNodeProps(): NodeProps | Promise<NodeProps>;
+	onInit?(): void | Promise<void>;
+	onRemove?(): void | Promise<void>;
 }
+
+/**
+ * Constructor type for a graph node. It defines the constructor signature for creating a graph node.
+ */
+export type GraphNodeConstructor<Node extends IGraphBaseEntityNode<string, number, Record<string, unknown>>> = new (
+	// biome-ignore lint/suspicious/noExplicitAny: This is a constructor type, so it can accept any arguments.
+	...args: any[]
+) => Node;
 
 /**
  * Node event mapping for the graph. It defines the events that can be emitted by a node.

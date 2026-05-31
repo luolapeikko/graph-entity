@@ -1,6 +1,6 @@
 {
 	"name": "@luolapeikko/graph-entity-types",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Typess for Graph Entity module",
 	"main": "./dist/index.cjs",
 	"module": "./dist/index.mjs",
@@ -17,7 +17,7 @@
 		"default": "./dist/index.mjs"
 	},
 	"scripts": {
-		"build": "tsdown src/index.ts --sourcemap --format esm --dts --clean -c tsconfig.build.json",
+		"build": "tsdown src/index.ts --sourcemap --format cjs,esm --dts --clean -c tsconfig.build.json",
 		"validate": "tsc --noEmit"
 	},
 	"files": [

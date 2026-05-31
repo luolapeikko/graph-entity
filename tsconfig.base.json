@@ -1,9 +1,9 @@
 {
 	"compilerOptions": {
-		"target": "ES2022",
+		"target": "ES2023",
 		"lib": ["esnext"],
-		"module": "NodeNext",
-		"moduleResolution": "NodeNext",
+		"module": "esnext",
+		"moduleResolution": "bundler",
 		"strict": true,
 		"declaration": true,
 		"declarationMap": true,
