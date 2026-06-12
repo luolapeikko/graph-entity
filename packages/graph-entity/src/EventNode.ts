@@ -9,7 +9,7 @@ export class EventNode<Id extends string, Type extends number, NodeProps extends
 	public readonly nodeId: Id;
 	private nodeProps: NodeProps;
 
-	public constructor(nodeType: Type, nodeId: Id, initialNodeProps: Awaited<ReturnType<IGraphEventEntityNode<Id, Type, NodeProps>['getNodeProps']>>) {
+	public constructor(nodeType: Type, nodeId: Id, initialNodeProps: NodeProps) {
 		super();
 		this.nodeType = nodeType;
 		this.nodeId = nodeId;
